@@ -1,0 +1,159 @@
+<sdf version="1.6">
+    <world name="bounded_area">
+        <include>
+            <uri>model://sun</uri>
+        </include>
+        <include>
+            <uri>model://ground_plane</uri>
+        </include>
+        <!-- Four cardboard walls -->
+        <model name="wall1">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box><size>10 0.1 2</size></box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box><size>10 0.1 2</size></box>
+                    </geometry>
+                </visual>
+            </link>
+            <pose>0 5 1 0 0 0</pose>
+        </model>
+        <model name="wall2">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box><size>10 0.1 2</size></box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box><size>10 0.1 2</size></box>
+                    </geometry>
+                </visual>
+            </link>
+            <pose>0 -5 1 0 0 0</pose>
+        </model>
+        <model name="wall3">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box><size>0.1 10 2</size></box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box><size>0.1 10 2</size></box>
+                    </geometry>
+                </visual>
+            </link>
+            <pose>5 0 1 0 0 0</pose>
+        </model>
+        <model name="wall4">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box><size>0.1 10 2</size></box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box><size>0.1 10 2</size></box>
+                    </geometry>
+                </visual>
+            </link>
+            <pose>-5 0 1 0 0 0</pose>
+        </model>
+        
+        <!-- Middle wall dividing the region into two -->
+        <model name="middle_wall">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box><size>0.1 10 2</size></box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box><size>0.1 10 2</size></box>
+                    </geometry>
+                </visual>
+            </link>
+            <pose>0 0 1 0 0 0</pose>
+        </model>
+
+        <!-- Obstacles on each side of the middle wall -->
+        <model name="obstacle1">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box><size>0.5 0.5 0.5</size></box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box><size>0.5 0.5 0.5</size></box>
+                    </geometry>
+                </visual>
+            </link>
+            <pose>2.5 2.5 0.25 0 0 0</pose>
+        </model>
+        <model name="obstacle2">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box><size>0.5 0.5 0.5</size></box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box><size>0.5 0.5 0.5</size></box>
+                    </geometry>
+                </visual>
+            </link>
+            <pose>-2.5 2.5 0.25 0 0 0</pose>
+        </model>
+        <model name="obstacle3">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box><size>0.5 0.5 0.5</size></box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box><size>0.5 0.5 0.5</size></box>
+                    </geometry>
+                </visual>
+            </link>
+            <pose>2.5 -2.5 0.25 0 0 0</pose>
+        </model>
+        <model name="obstacle4">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <box><size>0.5 0.5 0.5</size></box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box><size>0.5 0.5 0.5</size></box>
+                    </geometry>
+                </visual>
+            </link>
+            <pose>-2.5 -2.5 0.25 0 0 0</pose>
+        </model>
+    </world>
+</sdf>
