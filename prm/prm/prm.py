@@ -262,6 +262,7 @@ class PRMNode(Node):
         ])
         # Find a path (with fallback to lifted planning if necessary)
         shortest_path_points = self.find_shortest_path(self.roadmap, start_point, goal_point, self.sampled_points)
+        print(shortest_path_points)
         if not shortest_path_points:
             self.get_logger().error("Failed to find any valid path.")
             return

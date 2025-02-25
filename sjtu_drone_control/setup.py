@@ -23,7 +23,8 @@ setup(
         'console_scripts': [
             'teleop=sjtu_drone_control.teleop:main',
             'teleop_joystick=sjtu_drone_control.teleop_joystick:main',
-            'fellow_path_controller=sjtu_drone_control.fellow_path:main',
+            'fellow_path_controller=sjtu_drone_control.old_fellow_path:main',
+            
         ],
     },
 )
