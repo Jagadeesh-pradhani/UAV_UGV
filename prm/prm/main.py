@@ -183,7 +183,7 @@ def visualize_prm_over_pointcloud(pcd, sampled_points, roadmap, shortest_path_po
 # Main function
 def main():
     # Load the point cloud
-    pcd = generate_sample_pointcloud("/home/intel/fiverr/md/drone_ws/src/sjtu_drone_bringup/map/map/map.pcd")
+    pcd = generate_sample_pointcloud("/home/intel/fiverr/md/drone_ws/src/UAV_UGV/sjtu_drone_bringup/map/map/map.pcd")
 
     # Create an occupancy map
     voxel_size = 0.2

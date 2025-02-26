@@ -4,4 +4,4 @@ origin: [-20.000000, -15.000000, 0.0]
 resolution: 0.010000
 mode: trinary
 occupied_thresh: 0.95
-image: /home/intel/fiverr/md/drone_ws/src/sjtu_drone_bringup/map/map.pgm
+image: map.pgm

@@ -221,7 +221,7 @@ def main():
                         'pathfinding_time', 'simplification_time', 'total_time'])
 
     # Load point cloud and create occupancy map (one-time setup)
-    pcd = generate_sample_pointcloud("/home/intel/fiverr/md/drone_ws/src/sjtu_drone_bringup/map/map.pcd")
+    pcd = generate_sample_pointcloud("/home/intel/fiverr/md/drone_ws/src/UAV_UGV/jtu_drone_bringup/map/map.pcd")
     voxel_size = 0.2
     start_time = time.time()
     occupancy_grid, min_bound, voxel_size = create_occupancy_map(pcd, voxel_size=voxel_size)
