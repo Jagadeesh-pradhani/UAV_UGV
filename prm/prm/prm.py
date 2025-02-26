@@ -16,12 +16,12 @@ class PRMNode(Node):
         super().__init__('prm_node')
 
         prm_path = get_package_share_directory('sjtu_drone_bringup')
-        pcd_path=os.path.join(prm_path,'map','output_map.pcd')
+        pcd_path=os.path.join(prm_path,'map','map.pcd')
 
         # Parameters
         self.declare_parameter('pcd_path', pcd_path)
         self.declare_parameter('voxel_size', 0.2)
-        self.declare_parameter('num_samples', 1000)
+        self.declare_parameter('num_samples', 2000)
         self.declare_parameter('k_neighbors', 10)
         self.declare_parameter('max_cost', 100)
 
@@ -176,7 +176,7 @@ class PRMNode(Node):
         start_point = np.array([self.odom.pose.pose.position.x, self.odom.pose.pose.position.y, self.odom.pose.pose.position.z])
         shortest_path_points = self.find_shortest_path(self.roadmap, start_point, goal_point, self.sampled_points)
         simplified_path_points = self.simplify_path(shortest_path_points, self.occupancy_grid, self.min_bound, self.voxel_size)
-        self.publish_path(simplified_path_points)
+        self.publish_path(shortest_path_points)
 
     def publish_path(self, path_points):
         path_msg = Path()

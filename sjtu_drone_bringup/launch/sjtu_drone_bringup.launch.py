@@ -68,7 +68,7 @@ def generate_launch_description():
         default_value=os.path.join(
             sjtu_drone_bringup_path,
             'map',
-            'map_2.yaml'),
+            'map.yaml'),
         description='Full path to map file to load'
     )
 

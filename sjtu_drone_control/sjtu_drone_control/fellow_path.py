@@ -60,16 +60,16 @@ class FellowPathController(Node):
 
     def compute_velocity_commands(self):
         # Check if error distance is greater than 5.0
-        if self.error is not None and self.error > 3.0:  # Start slowing down early
-            self.desired_linear_vel -= 0.1  # Slow down linear velocity
-            self.get_logger().info(f"Slowing down {self.desired_linear_vel}.")
-            if self.desired_linear_vel <= 0.0:
-                self.desired_linear_vel = 0.0
-        else:
-            self.desired_linear_vel += 0.1
-            self.get_logger().info(f"Reset {self.desired_linear_vel}.")
-            if self.desired_linear_vel >= self.initial_vel:
-                self.desired_linear_vel = self.initial_vel
+        # if self.error is not None and self.error > 3.0:  # Start slowing down early
+        #     self.desired_linear_vel -= 0.1  # Slow down linear velocity
+        #     self.get_logger().info(f"Slowing down {self.desired_linear_vel}.")
+        #     if self.desired_linear_vel <= 0.0:
+        #         self.desired_linear_vel = 0.0
+        # else:
+        #     self.desired_linear_vel += 0.1
+        #     self.get_logger().info(f"Reset {self.desired_linear_vel}.")
+        #     if self.desired_linear_vel >= self.initial_vel:
+        #         self.desired_linear_vel = self.initial_vel
 
         if not self.path_queue or self.odom is None:
             return  # Wait for a path and odometry data to be available

@@ -214,7 +214,7 @@ def visualize_prm_over_pointcloud(pcd, sampled_points, roadmap, shortest_path_po
 # Main function
 def main():
     # Load the point cloud
-    pcd = generate_sample_pointcloud("/home/intel/fiverr/md/drone_ws/src/maps/output_map.pcd")
+    pcd = generate_sample_pointcloud("/home/intel/fiverr/md/drone_ws/src/sjtu_drone_bringup/map/map.pcd")
 
     # Create an occupancy map
     voxel_size = 0.2
@@ -228,7 +228,7 @@ def main():
 
     # Define the start and goal points
     start_point = np.array([0.0,0.0,1.0])  # Replace with actual start point
-    goal_point = np.array([10.0,0.0, 5.0])   # Replace with actual goal point
+    goal_point = np.array([15.6,6.24, 5.0])   # Replace with actual goal point
 
     # Find the shortest path using A* search
     shortest_path_points = find_shortest_path(roadmap, start_point, goal_point, sampled_points)
