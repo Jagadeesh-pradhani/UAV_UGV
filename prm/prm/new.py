@@ -221,7 +221,7 @@ def main():
     occupancy_grid, min_bound, voxel_size = create_occupancy_map(pcd, voxel_size=voxel_size)
 
     # Sample 1000 free voxels
-    sampled_points = sample_free_points(occupancy_grid, min_bound, voxel_size, num_samples=1000)
+    sampled_points = sample_free_points(occupancy_grid, min_bound, voxel_size, num_samples=10000)
 
     # Build the PRM roadmap
     roadmap = build_prm_roadmap(sampled_points, occupancy_grid, min_bound, voxel_size, k=10)

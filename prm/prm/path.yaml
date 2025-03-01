@@ -1,0 +1,66 @@
+ros2 topic pub /drone_path nav_msgs/msg/Path "header:
+  stamp:
+    sec: 0
+    nanosec: 0
+  frame_id: 'world'
+poses:
+- header:
+    stamp:
+      sec: 0
+      nanosec: 0
+    frame_id: 'world'
+  pose:
+    position:
+      x: 0.40000000000000213
+      y: -0.5003700000000002
+      z: 0.429999999
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+- header:
+    stamp:
+      sec: 0
+      nanosec: 0
+    frame_id: 'world'
+  pose:
+    position:
+      x: -4.0
+      y: -0.9003700000000006
+      z: 0.829999999
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+- header:
+    stamp:
+      sec: 0
+      nanosec: 0
+    frame_id: 'world'
+  pose:
+    position:
+      x: -7.799999999999999
+      y: 0.09962999999999944
+      z: 1.629999999
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+- header:
+    stamp:
+      sec: 0
+      nanosec: 0
+    frame_id: 'world'
+  pose:
+    position:
+      x: -10.6
+      y: -1.7003699999999995
+      z: 2.2299999990000003
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0" -1

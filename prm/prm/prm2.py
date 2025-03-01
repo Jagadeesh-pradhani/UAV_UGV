@@ -16,21 +16,23 @@ class PRMNode(Node):
         super().__init__('prm_node')
 
         prm_path = get_package_share_directory('sjtu_drone_bringup')
-        pcd_path=os.path.join(prm_path,'map','output_map.pcd')
+        pcd_path = os.path.join(prm_path, 'map', 'map.pcd')
 
         # Parameters
         self.declare_parameter('pcd_path', pcd_path)
         self.declare_parameter('voxel_size', 0.2)
         self.declare_parameter('num_samples', 500)
         self.declare_parameter('k_neighbors', 10)
-        self.declare_parameter('max_cost', 200)
+        self.declare_parameter('max_cost', 100)
+        self.declare_parameter('num_attempts', 5)  # Number of PRM attempts
 
-        # Initialize
+        # Initialize parameters
         self.pcd_path = self.get_parameter('pcd_path').get_parameter_value().string_value
         self.voxel_size = self.get_parameter('voxel_size').get_parameter_value().double_value
         self.num_samples = self.get_parameter('num_samples').get_parameter_value().integer_value
         self.k_neighbors = self.get_parameter('k_neighbors').get_parameter_value().integer_value
         self.max_cost = self.get_parameter('max_cost').get_parameter_value().integer_value
+        self.num_attempts = self.get_parameter('num_attempts').get_parameter_value().integer_value
 
         self.get_logger().info(f'Sampling {self.num_samples} points with {self.k_neighbors} neighbors...')
 
@@ -41,26 +43,19 @@ class PRMNode(Node):
             self.goal_callback,
             10
         )
-
         self.odometry = self.create_subscription(
             Odometry, 
             "simple_drone/odom", 
             self.odom_callback, 
             10
         )
-
-
         self.path_publisher = self.create_publisher(Path, '/drone_path', 10)
 
-        # Load Point Cloud and Initialize PRM
+        # Load Point Cloud and Initialize PRM-related maps
         self.get_logger().info('Loading point cloud...')
         self.pcd = self.generate_sample_pointcloud(self.pcd_path)
         self.occupancy_grid, self.min_bound, self.voxel_size = self.create_occupancy_map(self.pcd, self.voxel_size)
         self.costmap = self.generate_costmap(self.occupancy_grid, self.max_cost)
-        self.sampled_points = self.sample_free_points(self.occupancy_grid, self.min_bound, self.voxel_size, self.num_samples)
-        self.roadmap = self.build_prm_roadmap_with_costmap(
-            self.sampled_points, self.occupancy_grid, self.costmap, self.min_bound, self.voxel_size, self.k_neighbors
-        )
         self.get_logger().info('PRM initialized.')
 
     def odom_callback(self, msg):
@@ -134,16 +129,19 @@ class PRMNode(Node):
         return cost / len(line_points)
 
     def find_shortest_path(self, roadmap, start_point, goal_point, sampled_points):
+        # Find the nearest node indices for start and goal
         start_idx = np.argmin(np.linalg.norm(np.array(sampled_points) - start_point, axis=1))
         goal_idx = np.argmin(np.linalg.norm(np.array(sampled_points) - goal_point, axis=1))
         try:
-            path = nx.astar_path(roadmap, start_idx, goal_idx, weight='weight')
-            return [sampled_points[i] for i in path]
+            path_indices = nx.astar_path(roadmap, start_idx, goal_idx, weight='weight')
+            return [sampled_points[i] for i in path_indices]
         except nx.NetworkXNoPath:
-            self.get_logger().error("No path found")
+            self.get_logger().error("No path found in current attempt.")
             return []
 
     def simplify_path(self, points, occupancy_grid, min_bound, voxel_size):
+        if len(points) == 0:
+            return []
         simplified_points = [points[0]]  # Always keep the start point
         end_point = points[-1]
         i = 0  # Start from the first point
@@ -151,36 +149,64 @@ class PRMNode(Node):
         while i < len(points) - 1:
             low = i + 1
             high = len(points) - 1
-            candidate = i  # Will store the farthest collision-free index found
+            candidate = i  # Farthest collision-free index from points[i]
 
-            # Binary search to find the farthest collision-free point from points[i]
+            # Binary search for the farthest collision-free point from points[i]
             while low <= high:
                 mid = (low + high) // 2
                 if self.is_collision_free(points[i], points[mid], occupancy_grid, min_bound, voxel_size):
-                    candidate = mid  # Update candidate because the segment is collision-free
-                    low = mid + 1  # Try to see if we can go further
+                    candidate = mid  # Segment is collision-free; try to go further
+                    low = mid + 1
                 else:
-                    high = mid - 1  # Look in the lower half
+                    high = mid - 1
 
-            # If a valid candidate is found (it should always be at least i+1)
             if candidate > i:
                 simplified_points.append(points[candidate])
-                i = candidate  # Jump to the farthest collision-free point
+                i = candidate
             else:
-                # In case no candidate is found, move one step forward to avoid an infinite loop.
+                # Advance one step if no candidate found to avoid infinite loop
                 i += 1
                 simplified_points.append(points[i])
+        # if simplified_points[-1] != end_point:
         simplified_points.append(end_point)  # Always keep the end point
 
         return simplified_points
 
     def goal_callback(self, msg):
         goal_point = np.array([msg.x, msg.y, msg.z])
-        # start_point = np.array([0.0, 0.0, 1.0])  # Replace with actual start point
-        start_point = np.array([self.odom.pose.pose.position.x, self.odom.pose.pose.position.y, self.odom.pose.pose.position.z])
-        shortest_path_points = self.find_shortest_path(self.roadmap, start_point, goal_point, self.sampled_points)
-        simplified_path_points = self.simplify_path(shortest_path_points, self.occupancy_grid, self.min_bound, self.voxel_size)
-        self.publish_path(shortest_path_points)
+        start_point = np.array([
+            self.odom.pose.pose.position.x, 
+            self.odom.pose.pose.position.y, 
+            self.odom.pose.pose.position.z
+        ])
+
+        best_path = []
+        best_length = float('inf')
+
+        # Run PRM for a number of attempts to find multiple candidate paths
+        for attempt in range(self.num_attempts):
+            self.get_logger().info(f'Attempt {attempt + 1} of {self.num_attempts}')
+            sampled_points = self.sample_free_points(self.occupancy_grid, self.min_bound, self.voxel_size, self.num_samples)
+            roadmap = self.build_prm_roadmap_with_costmap(
+                sampled_points, self.occupancy_grid, self.costmap, self.min_bound, self.voxel_size, self.k_neighbors
+            )
+            current_path = self.find_shortest_path(roadmap, start_point, goal_point, sampled_points)
+            if not current_path:
+                continue
+
+            # Compute the total Euclidean length of the path
+            current_length = sum(np.linalg.norm(current_path[i] - current_path[i-1]) for i in range(1, len(current_path)))
+            self.get_logger().info(f'Attempt {attempt + 1}: Path length = {current_length}')
+
+            if current_length < best_length:
+                best_length = current_length
+                best_path = current_path
+
+        if best_path:
+            simplified_path_points = self.simplify_path(best_path, self.occupancy_grid, self.min_bound, self.voxel_size)
+            self.publish_path(best_path)
+        else:
+            self.get_logger().error('No valid path found after all attempts.')
 
     def publish_path(self, path_points):
         path_msg = Path()

@@ -36,6 +36,7 @@ class FellowPathController(Node):
         self.takeoff_publisher = self.create_publisher(Empty, '/simple_drone/takeoff', 10)
         self.mode_switch_publisher = self.create_publisher(Bool, '/simple_drone/cmd_mode', 10)
         self.velocity_publisher = self.create_publisher(Twist, '/simple_drone/cmd_vel', 10)
+        self.goal_reached_publisher = self.create_publisher(Empty, '/goal_reached', 10)
         
         self.state_subscriber = self.create_subscription(Int8, '/simple_drone/state', self.state_callback, 10)
         self.odometry = self.create_subscription(Odometry, "simple_drone/odom", self.odom_callback, 10)
@@ -102,11 +103,13 @@ class FellowPathController(Node):
         if not self.path_queue:
             self.get_logger().info("Path complete.")
             self.set_velocity(0.0, 0.0, 0.0)
+            self.goal_reached_publisher.publish(Empty())
             return
 
         # If no carrot point is found, path is complete
         if carrot_point is None:
             self.get_logger().info("Path complete.")
+            self.goal_reached_publisher.publish(Empty())
             return
 
         # Calculate angle to the carrot point

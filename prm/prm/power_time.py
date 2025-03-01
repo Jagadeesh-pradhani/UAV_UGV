@@ -4,6 +4,7 @@ from rclpy.node import Node
 from nav_msgs.msg import Odometry, Path
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Float32
+from std_msgs.msg import Empty
 import csv
 from builtin_interfaces.msg import Time
 import time
@@ -11,6 +12,11 @@ import time
 class PowerCalculator(Node):
     def __init__(self):
         super().__init__('energy_model_node')
+
+        self.declare_parameter('num_samples', 500)
+
+        self.num_samples = self.get_parameter('num_samples').get_parameter_value().integer_value
+
         
         # Parameters from the table
         self.rho = 1.225       # Air density (kg/m³)
@@ -37,8 +43,10 @@ class PowerCalculator(Node):
         self.mission_start_time = None
         self.last_update_time = None
 
+        
+
         # CSV setup
-        self.csv_file = open('power_timing_log.csv', 'w')
+        self.csv_file = open(f'{self.num_samples}.csv', 'w')
         self.csv_writer = csv.writer(self.csv_file)
         self.csv_writer.writerow([
             'timestamp', 
@@ -53,6 +61,7 @@ class PowerCalculator(Node):
         # Subscribers
         self.create_subscription(Path, '/drone_path', self.path_callback, 10)
         self.create_subscription(Odometry, '/simple_drone/odom', self.odom_callback, 10)
+        self.create_subscription(Empty, '/goal_reached', self.goal_reached_callback, 10)
         
         # Publisher
         self.power_pub = self.create_publisher(Float32, '/drone_power', 10)
@@ -111,6 +120,13 @@ class PowerCalculator(Node):
 
         # Update timing
         self.last_update_time = current_time
+
+    def goal_reached_callback(self, msg):
+        """Callback when a goal is reached. Move to the next goal."""
+        self.get_logger().info('Received goal reached signal.')
+        exit()
+        
+        
 
     def __del__(self):
         self.csv_file.close()
