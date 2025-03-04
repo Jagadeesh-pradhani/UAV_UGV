@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np  # Added import for linear regression
 
 # Load travel time data from JSON file
 with open('prm_paths_with_travel_time.json', 'r') as f:
@@ -24,24 +25,40 @@ travel_data = {
 }
 travel_df = pd.DataFrame(travel_data)
 
+# Extract data for regression
+x = travel_df['num_samples'].to_numpy()
+y_astar = travel_df['A*'].to_numpy()
+y_sastar = travel_df['SA*'].to_numpy()
+
+# Perform linear regression for A* and SA*
+coefficients_astar = np.polyfit(x, y_astar, 1)
+poly_astar = np.poly1d(coefficients_astar)
+regression_astar = poly_astar(x)
+
+coefficients_sastar = np.polyfit(x, y_sastar, 1)
+poly_sastar = np.poly1d(coefficients_sastar)
+regression_sastar = poly_sastar(x)
+
 # Load timing data from CSV file
 df = pd.read_csv('prm_timing_results.csv')
 
 # Create figure and axis for plotting
 fig, ax_left = plt.subplots()
 
-# Left Y-axis (Travel Time) - Normal Scale (removed semilog scale)
+# Left Y-axis (Travel Time) - Plot original data and regression lines
 ax_left.set_ylabel('Travel Time (seconds)', color='black')
-ax_left.plot(travel_df['num_samples'].to_numpy(), travel_df['A*'].to_numpy(), 
-             color='purple', linestyle='--', marker='o', label='A* Travel Time')
-ax_left.plot(travel_df['num_samples'].to_numpy(), travel_df['SA*'].to_numpy(), 
-             color='orange', linestyle='-.', marker='s', label='A* + Pruning path Travel Time')
+# Original data points
+# ax_left.plot(x, y_astar, color='purple', linestyle='--', marker='o', label='A* Travel Time')
+# ax_left.plot(x, y_sastar, color='orange', linestyle='-.', marker='s', label='SA* Travel Time')
+# Regression lines
+ax_left.plot(x, regression_astar, color='purple', linestyle='-', label='A* Travel Time')
+ax_left.plot(x, regression_sastar, color='orange', linestyle='-', label='A* + Pruning path')
 ax_left.tick_params(axis='y', labelcolor='black')
 
 # Right Y-axis (Timing Metrics) - Semilog Scale remains
 ax_right = ax_left.twinx()
 ax_right.set_yscale('log')
-ax_right.set_ylabel('Time (seconds)', color='black')
+ax_right.set_ylabel('Execution Time (seconds)', color='black')
 
 num_samples_csv = df['num_samples'].to_numpy()
 sampling_roadmap = (df['sampling_time'] + df['roadmap_time']).to_numpy()
@@ -53,7 +70,7 @@ ax_right.plot(num_samples_csv, pathfinding, color='green', linestyle='-', marker
 ax_right.plot(num_samples_csv, simplification_pathfinding, color='red', linestyle='-', marker='^', label='A* + Pruning Path')
 
 ax_left.set_xlabel('Number of Nodes')
-plt.title('Time vs. Number of Samples')
+plt.title('Time vs. Number of Nodes')
 
 # Legends and Grid
 ax_left.legend(loc='upper left', fontsize=10)

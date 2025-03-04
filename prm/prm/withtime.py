@@ -229,9 +229,9 @@ def main():
     print(f"One-time setup time: {setup_time:.2f}s")
 
     # Test different sample sizes
-    sample_sizes = range(500, 3001, 20)
+    sample_sizes = range(1000, 60001, 1000)
     start_point = np.array([0.0, 0.0, 1.0])
-    goal_point = np.array([15.6, 6.24, 5.0])
+    goal_point = np.array([-12.0, 0.0, 5.0])
 
     for num_samples in sample_sizes:
         print(f"\n--- Testing with {num_samples} samples ---")

@@ -118,7 +118,7 @@ def main():
 
     # Parameters for PRM and attempts
     k_neighbors = 10
-    num_attempts = 5
+    num_attempts = 1
 
     # Define start and goal points
     start_point = np.array([0.0, 0.0, 1.0])  # Replace with actual start point if needed
@@ -127,7 +127,7 @@ def main():
     results = []  # List to hold results for each sample size
 
     # Run simulation for sample sizes from 500 to 3000 in steps of 500
-    for current_samples in range(500, 3001, 500):
+    for current_samples in range(1000, 60001, 1000):
         print(f"Running simulation for num_samples = {current_samples}")
         best_path = None
         best_length = float('inf')
