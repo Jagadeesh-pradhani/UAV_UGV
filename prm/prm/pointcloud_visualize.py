@@ -16,7 +16,7 @@ class PCDPublisher(Node):
         self.timer = self.create_timer(2.0, self.timer_callback)  # Adjust the publishing rate
         # self.pcd = o3d.io.read_point_cloud("/home/intel/fiverr/md/drone_ws/src/maps/output_map.pcd")  # Adjust the path to your .pcd file
         prm_path = get_package_share_directory('sjtu_drone_bringup')
-        pcd_path=os.path.join(prm_path,'map','output_map.pcd')
+        pcd_path=os.path.join(prm_path,'map','map.pcd')
         self.pcd = o3d.io.read_point_cloud(pcd_path)
 
     def timer_callback(self):

@@ -16,7 +16,7 @@ class PRMNode(Node):
         super().__init__('prm_node')
 
         prm_path = get_package_share_directory('sjtu_drone_bringup')
-        pcd_path=os.path.join(prm_path,'map','output_map.pcd')
+        pcd_path=os.path.join(prm_path,'map','map.pcd')
 
         # Parameters
         self.declare_parameter('pcd_path', pcd_path)

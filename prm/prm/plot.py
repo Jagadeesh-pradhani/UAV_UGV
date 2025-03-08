@@ -25,7 +25,7 @@ travel_data = {
 travel_df = pd.DataFrame(travel_data)
 
 # Load timing data from CSV file
-df = pd.read_csv('prm_timing_results.csv')
+df = pd.read_csv('prm_timing_results_60k.csv')
 
 # Create figure and axis for plotting
 fig, ax_left = plt.subplots()

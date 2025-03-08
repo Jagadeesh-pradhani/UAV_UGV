@@ -179,12 +179,12 @@ def generate_launch_description():
             name='fellow_path_controller',
             output='screen',
         ),
-        # Node(
-        #     package='prm',
-        #     executable='map_publisher',
-        #     name='map_publisher',
-        #     output='screen',
-        # )
+        Node(
+            package='prm',
+            executable='map_publisher',
+            name='map_publisher',
+            output='screen',
+        )
 
 
 
