@@ -100,7 +100,7 @@ def generate_launch_description():
         Node(
             package="sjtu_drone_bringup",
             executable="spawn_drone",
-            arguments=[robot_desc, model_ns, "1.0"],
+            arguments=[robot_desc, model_ns, "1.0", "1.0", "0.0"],
             output="screen"
         ),
 

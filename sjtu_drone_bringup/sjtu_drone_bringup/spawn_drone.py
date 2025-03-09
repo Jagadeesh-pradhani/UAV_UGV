@@ -27,6 +27,8 @@ def main(args=None):
     content = sys.argv[1]
     namespace = sys.argv[2]
     x_pose = sys.argv[3]
+    y_pose = sys.argv[4]
+    z_pose = sys.argv[5]
 
     req = SpawnEntity.Request()
     req.name = namespace
@@ -34,6 +36,8 @@ def main(args=None):
     req.robot_namespace = namespace
     req.reference_frame = "world"
     req.initial_pose.position.x = float(x_pose)
+    req.initial_pose.position.y = float(y_pose)
+    req.initial_pose.position.z = float(z_pose)
 
     while not cli.wait_for_service(timeout_sec=1.0):
         node.get_logger().info('service not available, waiting again...')

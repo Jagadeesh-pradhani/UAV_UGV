@@ -267,7 +267,7 @@ class PRMNode(Node):
             self.get_logger().error("Failed to find any valid path.")
             return
         simplified_path_points = self.simplify_path(shortest_path_points, self.occupancy_grid, self.min_bound, self.voxel_size)
-        self.publish_path(shortest_path_points)
+        self.publish_path(simplified_path_points)
 
     def publish_path(self, path_points):
         path_msg = Path()

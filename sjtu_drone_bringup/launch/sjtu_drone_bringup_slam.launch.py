@@ -68,7 +68,7 @@ def generate_launch_description():
         default_value=os.path.join(
             sjtu_drone_bringup_path,
             'map',
-            'map_2.yaml'),
+            'map.yaml'),
         description='Full path to map file to load'
     )
 
@@ -88,7 +88,7 @@ def generate_launch_description():
     )
     y_pose = DeclareLaunchArgument(
         "y_pose",
-        default_value="1.0",
+        default_value="0.0",
         description="Initial y position for the turtlebot in Gazebo"
     )
     
@@ -121,13 +121,13 @@ def generate_launch_description():
             default_value="keyboard",
             description="Type of controller: keyboard (default) or joystick",
         ),
-        # Node(
-        #     package="rviz2",
-        #     executable="rviz2",
-        #     name="rviz2",
-        #     arguments=["-d", rviz_path],
-        #     output="screen",
-        # ),
+        Node(
+            package="rviz2",
+            executable="rviz2",
+            name="rviz2",
+            arguments=["-d", rviz_path],
+            output="screen",
+        ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(sjtu_drone_bringup_path, 'launch', 'sjtu_drone_slam.launch.py')
@@ -139,22 +139,22 @@ def generate_launch_description():
         #     )
         # ),
 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                os.path.join(launch_file_dir, 'robot_state_publisher.launch.py')
-            ),
-            launch_arguments={'use_sim_time': use_sim_time}.items()
-        ),
+        # IncludeLaunchDescription(
+        #     PythonLaunchDescriptionSource(
+        #         os.path.join(launch_file_dir, 'robot_state_publisher.launch.py')
+        #     ),
+        #     launch_arguments={'use_sim_time': use_sim_time}.items()
+        # ),
 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                os.path.join(launch_file_dir, 'spawn_turtlebot3.launch.py')
-            ),
-            launch_arguments={
-                'x_pose': LaunchConfiguration('x_pose'),
-                'y_pose': LaunchConfiguration('y_pose')
-            }.items()
-        ),
+        # IncludeLaunchDescription(
+        #     PythonLaunchDescriptionSource(
+        #         os.path.join(launch_file_dir, 'spawn_turtlebot3.launch.py')
+        #     ),
+        #     launch_arguments={
+        #         'x_pose': LaunchConfiguration('x_pose'),
+        #         'y_pose': LaunchConfiguration('y_pose')
+        #     }.items()
+        # ),
         
 
         # IncludeLaunchDescription(
@@ -166,12 +166,12 @@ def generate_launch_description():
         #         'use_sim_time': use_sim_time,
         #         'params_file': params_file}.items(),
         # ),
-        # Node(
-        #     package="tf2_ros",
-        #     executable="static_transform_publisher",
-        #     arguments=["0", "0", "0", "0", "0", "0", "world", "map"],
-        #     output="screen"
-        # ),
+        Node(
+            package="tf2_ros",
+            executable="static_transform_publisher",
+            arguments=["0", "0", "0", "0", "0", "0", "world", "map"],
+            output="screen"
+        ),
         
         # Node(
         #     package='sjtu_drone_control',
