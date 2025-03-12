@@ -47,18 +47,21 @@ fig, ax_left = plt.subplots(figsize=(10, 6))  # Adjust figure size
 
 # Left Y-axis (Travel Time) - Plot original data and regression lines
 ax_left.set_ylabel('Travel Time (seconds)', color='black', fontsize=30)
+ax_left.tick_params(axis='both', labelsize=20) 
+ 
 # Original data points
 ax_left.plot(x, y_astar, color='purple', linestyle='--', marker='o')
 ax_left.plot(x, y_sastar, color='orange', linestyle='-.', marker='s')
 # Regression lines
 ax_left.plot(x, regression_astar, color='purple', linestyle='-', label='A* Travel Time')
 ax_left.plot(x, regression_sastar, color='orange', linestyle='-', label='A* + Pruning path')
-ax_left.tick_params(axis='y', labelcolor='black', labelsize=12)
+ax_left.tick_params(axis='y', labelcolor='black', labelsize=20)
 
 # Right Y-axis (Timing Metrics) - Semilog Scale remains
 ax_right = ax_left.twinx()
 ax_right.set_yscale('log')
 ax_right.set_ylabel('Execution Time (seconds)', color='black', fontsize=30)
+ax_right.tick_params(axis='both', labelsize=20) 
 
 num_samples_csv = df['num_samples'].to_numpy()
 sampling_roadmap = (df['sampling_time'] + df['roadmap_time']).to_numpy()
@@ -70,7 +73,7 @@ ax_right.plot(num_samples_csv, pathfinding, color='green', linestyle='-', marker
 ax_right.plot(num_samples_csv, simplification_pathfinding, color='red', linestyle='-', marker='^', label='A* + Pruning Path')
 
 ax_left.set_xlabel('Number of Nodes', fontsize=30)
-plt.title('Time vs. Number of Nodes', fontsize=30)
+# plt.title('Time vs. Number of Nodes', fontsize=30)
 
 # Legends and Grid
 ax_left.legend(loc='upper left', fontsize=14)
