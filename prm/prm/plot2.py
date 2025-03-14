@@ -47,21 +47,21 @@ fig, ax_left = plt.subplots(figsize=(10, 6))  # Adjust figure size
 
 # Left Y-axis (Travel Time) - Plot original data and regression lines
 ax_left.set_ylabel('Travel Time (seconds)', color='black', fontsize=30)
-ax_left.tick_params(axis='both', labelsize=20) 
+ax_left.tick_params(axis='both', labelsize=30) 
  
 # Original data points
 ax_left.plot(x, y_astar, color='purple', linestyle='--', marker='o')
 ax_left.plot(x, y_sastar, color='orange', linestyle='-.', marker='s')
 # Regression lines
-ax_left.plot(x, regression_astar, color='purple', linestyle='-', label='A* Travel Time')
-ax_left.plot(x, regression_sastar, color='orange', linestyle='-', label='A* + Pruning path')
-ax_left.tick_params(axis='y', labelcolor='black', labelsize=20)
+ax_left.plot(x, regression_astar, color='purple', linestyle='-', label='PRM + A*')
+ax_left.plot(x, regression_sastar, color='orange', linestyle='-', label='PRM + A* + Path Pruning')
+ax_left.tick_params(axis='y', labelcolor='black', labelsize=30)
 
 # Right Y-axis (Timing Metrics) - Semilog Scale remains
 ax_right = ax_left.twinx()
 ax_right.set_yscale('log')
 ax_right.set_ylabel('Execution Time (seconds)', color='black', fontsize=30)
-ax_right.tick_params(axis='both', labelsize=20) 
+ax_right.tick_params(axis='both', labelsize=30) 
 
 num_samples_csv = df['num_samples'].to_numpy()
 sampling_roadmap = (df['sampling_time'] + df['roadmap_time']).to_numpy()
