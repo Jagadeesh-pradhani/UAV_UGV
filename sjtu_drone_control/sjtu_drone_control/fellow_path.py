@@ -1,12 +1,20 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Empty, Bool, Int8, Float64
+from std_msgs.msg import Empty, Bool, Int8
 from geometry_msgs.msg import Twist, PoseStamped
 from nav_msgs.msg import Odometry, Path
 import numpy as np
 import math
 from collections import deque
 import time
+# states={
+#     landed,
+#     takeoff,
+#     flying,
+#     landing
+# }
+    
+
 
 # Function to convert quaternion to Euler angles
 def euler_from_quaternion(quaternion):
@@ -36,41 +44,28 @@ class FellowPathController(Node):
         self.takeoff_publisher = self.create_publisher(Empty, '/simple_drone/takeoff', 10)
         self.mode_switch_publisher = self.create_publisher(Bool, '/simple_drone/cmd_mode', 10)
         self.velocity_publisher = self.create_publisher(Twist, '/simple_drone/cmd_vel', 10)
+        self.goal_reached_publisher = self.create_publisher(Empty, '/goal_reached', 10)
         
         self.state_subscriber = self.create_subscription(Int8, '/simple_drone/state', self.state_callback, 10)
         self.odometry = self.create_subscription(Odometry, "simple_drone/odom", self.odom_callback, 10)
         self.path_sub = self.create_subscription(Path, "drone_path", self.set_path, 10)
-        self.error_distance_sub = self.create_subscription(Float64, '/error_distance', self.error_distance_callback, 10)
+        
         self.drone_state = 0  # Default state is "Landed"
         self.takeoff_initiated = False
         self.vel_mode_set = False
         self.odom = None  # Set to None initially
         self.path_queue = deque()  # Initialize an empty deque for storing interpolated path poses
-        self.initial_vel = 1.3
-        self.desired_linear_vel = self.initial_vel  # Linear velocity
+        self.desired_linear_vel = 0.3  # Linear velocity
         self.lookahead_distance = 0.3
         self.min_angle_tolerance=0.3 
         self.max_linear_vel_z = 0.43  # m/s
         self.approach_velocity_scaling_dist_ = 0.1 # meters
         self.initial_alignment_done = False  # Flag for initial alignment
-        self.error = None  # Error distance to the drone
 
         # Set up a timer to call compute_velocity_commands at a frequency of 10 Hz
         self.timer = self.create_timer(0.1, self.compute_velocity_commands)  # 10 Hz frequency
 
     def compute_velocity_commands(self):
-        # Check if error distance is greater than 5.0
-        if self.error is not None and self.error > 3.0:  # Start slowing down early
-            self.desired_linear_vel -= 0.1  # Slow down linear velocity
-            self.get_logger().info(f"Slowing down {self.desired_linear_vel}.")
-            if self.desired_linear_vel <= 0.0:
-                self.desired_linear_vel = 0.0
-        else:
-            self.desired_linear_vel += 0.1
-            self.get_logger().info(f"Reset {self.desired_linear_vel}.")
-            if self.desired_linear_vel >= self.initial_vel:
-                self.desired_linear_vel = self.initial_vel
-
         if not self.path_queue or self.odom is None:
             return  # Wait for a path and odometry data to be available
 
@@ -102,11 +97,13 @@ class FellowPathController(Node):
         if not self.path_queue:
             self.get_logger().info("Path complete.")
             self.set_velocity(0.0, 0.0, 0.0)
+            self.goal_reached_publisher.publish(Empty())
             return
 
         # If no carrot point is found, path is complete
         if carrot_point is None:
             self.get_logger().info("Path complete.")
+            self.goal_reached_publisher.publish(Empty())
             return
 
         # Calculate angle to the carrot point
@@ -147,10 +144,6 @@ class FellowPathController(Node):
 
             self.get_logger().info(f"Moving to carrot point: x: {linear_vel}, angular z: {angular_vel},linear_vel_z: {linear_vel_z}")
     
-    def error_distance_callback(self, msg):
-        # Log the distance to the drone for debugging
-        self.error = msg.data
-
     def set_path(self, msg):
         # Clear current path queue and interpolate the entire path
         self.path_queue.clear()
